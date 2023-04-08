@@ -1,5 +1,16 @@
 const std = @import("std");
-const version = @embedFile("VERSION");
+
+const version = blk: {
+    const info = @embedFile("package/info");
+    var lines = std.mem.split(u8, info, "\n");
+    while (lines.next()) |line| {
+        const eq_idx = std.mem.indexOfScalar(u8, line, '=') orelse continue;
+        if (std.mem.eql(u8, line[0..eq_idx], "version")) {
+            break :blk line[eq_idx + 1 ..];
+        }
+    }
+    @compileError("Could not find version in package/info file");
+};
 
 const libanopa_files = .{
     "src/libanopa/copy_file.c",
