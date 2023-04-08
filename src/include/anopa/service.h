@@ -85,7 +85,7 @@ typedef struct
     unsigned int secs_timeout;
     aa_ls ls;
     aa_service_status st;
-    tain_t ts_exec;
+    tain ts_exec;
     /* longrun */
     uint16_t ft_id;
     int gets_ready;

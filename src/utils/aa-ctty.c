@@ -25,6 +25,7 @@
 #include <sys/ioctl.h>
 #include <skalibs/types.h>
 #include <skalibs/djbunix.h>
+#include <skalibs/exec.h>
 #include <anopa/common.h>
 #include <anopa/output.h>
 
@@ -96,6 +97,6 @@ main (int argc, char * const argv[], char const * const *envp)
     if (ioctl (fd, TIOCSCTTY, steal) < 0)
         aa_strerr_warnu1sys ("set controlling terminal");
 
-    pathexec_run (argv[0], (char const * const *) argv, envp);
+    exec_ae (argv[0], (char const * const *) argv, envp);
     aa_strerr_dieexec (111, argv[0]);
 }

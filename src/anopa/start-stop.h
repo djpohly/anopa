@@ -42,7 +42,7 @@
 extern genalloc ga_iop;
 extern genalloc ga_progress;
 extern genalloc ga_pid;
-extern tain_t iol_deadline;
+extern tain iol_deadline;
 extern unsigned int draw;
 extern int nb_already;
 extern int nb_done;

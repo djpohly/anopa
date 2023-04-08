@@ -42,7 +42,7 @@
 #include <skalibs/djbtime.h>
 #include <skalibs/tai.h>
 #include <skalibs/sig.h>
-#include <s6/s6-supervise.h>
+#include <s6/supervise.h>
 #include <anopa/common.h>
 #include <anopa/output.h>
 #include <anopa/init_repo.h>
@@ -72,7 +72,7 @@ struct serv
     int si;
     int is_s6;
     s6_svstatus_t st6;
-    tain_t stamp;
+    tain stamp;
 };
 
 enum
@@ -126,11 +126,11 @@ put_wstat (int wstat, size_t max, int pad)
 }
 
 static void
-put_time (tain_t *st_stamp, int strict)
+put_time (tain *st_stamp, int strict)
 {
     char buf[LOCALTMN_FMT];
-    localtmn_t local;
-    tain_t stamp;
+    localtmn local;
+    tain stamp;
     int n;
 
     localtmn_from_tain (&local, st_stamp, 1);
@@ -398,7 +398,7 @@ status_service (struct serv *serv, struct config *cfg)
             put_s (" (PID ");
             buf[uint_fmt (buf, serv->st6.pid)] = '\0';
             put_s (buf);
-            if (cfg->mode == MODE_LIST && !serv->st6.flagwant)
+            if (cfg->mode == MODE_LIST && !serv->st6.flagwantup)
             {
                 put_s ("; Once");
             }
@@ -407,7 +407,7 @@ status_service (struct serv *serv, struct config *cfg)
             if (cfg->mode != MODE_LIST)
             {
                 aa_bs_noflush (AA_OUT, "\nMode:    ");
-                if (serv->st6.flagwant)
+                if (serv->st6.flagwantup)
                 {
                     put_s ("Automatic restart (want up)");
                 }
@@ -428,7 +428,7 @@ status_service (struct serv *serv, struct config *cfg)
             aa_is_noflush (AA_OUT, ANSI_HIGHLIGHT_OFF);
             put_s (" (");
             put_wstat (serv->st6.wstat, max, 0);
-            if (serv->st6.flagwant && serv->st6.flagwantup)
+            if (serv->st6.flagwantup)
             {
                 put_s ("; ");
                 aa_is_noflush (AA_OUT, ANSI_HIGHLIGHT_BLUE_ON);
@@ -443,7 +443,7 @@ status_service (struct serv *serv, struct config *cfg)
              * given that one cannot start a service w/out specifying the mode
              * to be set (-u for up, -o for once))
              */
-            if (cfg->mode != MODE_LIST && serv->st6.flagwant && serv->st6.flagwantup)
+            if (cfg->mode != MODE_LIST && serv->st6.flagwantup)
             {
                 aa_bs_noflush (AA_OUT, "\nMode:    ");
                 put_s ("Automatic restart (want up)");

@@ -26,7 +26,7 @@
 #include <skalibs/djbunix.h>
 #include <skalibs/bytestr.h>
 #include <s6/ftrigw.h>
-#include <s6/s6-supervise.h>
+#include <s6/supervise.h>
 #include <anopa/common.h>
 #include <anopa/output.h>
 

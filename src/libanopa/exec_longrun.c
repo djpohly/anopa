@@ -26,7 +26,7 @@
 #include <skalibs/djbunix.h>
 #include <skalibs/bytestr.h>
 #include <skalibs/tai.h>
-#include <s6/s6-supervise.h>
+#include <s6/supervise.h>
 #include <s6/ftrigr.h>
 #include <anopa/service.h>
 #include <anopa/err.h>
@@ -40,7 +40,7 @@ _exec_longrun (int si, aa_mode mode)
     s6_svstatus_t st6 = S6_SVSTATUS_ZERO;
     size_t l_sn = strlen (aa_service_name (s));
     char fifodir[l_sn + 1 + sizeof (S6_SUPERVISE_EVENTDIR)];
-    tain_t deadline;
+    tain deadline;
     int is_start = (mode & AA_MODE_START) ? 1 : 0;
     const char *event = (is_start) ? ((s->gets_ready) ? "[udU]" : "u") : "D";
     const char *cmd = (is_start) ? "u" : (mode & AA_MODE_STOP_ALL) ? "dx" : "d";
@@ -248,7 +248,7 @@ aa_get_longrun_info (uint16_t *id, char *event)
 int
 aa_unsubscribe_for (uint16_t id)
 {
-    tain_t deadline;
+    tain deadline;
 
     tain_addsec_g (&deadline, 1);
     return (ftrigr_unsubscribe_g (&_aa_ft, id, &deadline)) ? 0 : -1;

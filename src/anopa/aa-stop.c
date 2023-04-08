@@ -36,7 +36,7 @@
 #include <skalibs/types.h>
 #include <skalibs/tai.h>
 #include <skalibs/djbunix.h>
-#include <s6/s6-supervise.h>
+#include <s6/supervise.h>
 #include <anopa/common.h>
 #include <anopa/err.h>
 #include <anopa/init_repo.h>

@@ -28,6 +28,7 @@
 #include <skalibs/sgetopt.h>
 #include <skalibs/genalloc.h>
 #include <skalibs/stralloc.h>
+#include <skalibs/exec.h>
 #include <execline/execline.h>
 #include <anopa/common.h>
 #include <anopa/output.h>
@@ -254,7 +255,7 @@ main (int argc, char const **argv, char const *const *envp)
         if (!env_make (v, r, dst.s, dst.len))
             aa_strerr_diefu1sys (5, "env_make");
         v[r] = 0;
-        pathexec_r (v, envp, env_len (envp), info.modifs.s, info.modifs.len);
+        mexec_fm (v, envp, env_len (envp), info.modifs.s, info.modifs.len);
     }
 
     aa_strerr_dieexec (6, dst.s);

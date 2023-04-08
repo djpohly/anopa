@@ -25,6 +25,7 @@
 #include <getopt.h>
 #include <unistd.h>
 #include <skalibs/djbunix.h>
+#include <skalibs/exec.h>
 #include <anopa/common.h>
 #include <anopa/output.h>
 
@@ -84,6 +85,6 @@ main (int argc, char * const argv[], char * const envp[])
         aa_strerr_diefu1sys (3, "chroot");
     if (chdir ("/") < 0)
         aa_strerr_diefu1sys (3, "chdir to new root");
-    pathexec_run (argv[1], (char const * const *) argv + 1, (char const * const *) envp);
+    exec_ae (argv[1], (char const * const *) argv + 1, (char const * const *) envp);
     aa_strerr_dieexec (4, argv[1]);
 }

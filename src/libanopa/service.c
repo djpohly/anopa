@@ -30,7 +30,7 @@
 #include <skalibs/direntry.h>
 #include <skalibs/types.h>
 #include <skalibs/tai.h>
-#include <s6/s6-supervise.h>
+#include <s6/supervise.h>
 #include <s6/ftrigr.h>
 #include <anopa/service.h>
 #include <anopa/ga_int_list.h>
@@ -258,7 +258,7 @@ aa_ensure_service_loaded (int si, aa_mode mode, int no_wants, aa_autoload_cb al_
                 if (is_up && aa_service (si)->gets_ready && st6.flagready)
                     is_up = 2;
                 else if ((mode & (AA_MODE_STOP | AA_MODE_STOP_ALL))
-                            && !is_up && st6.flagwant && st6.flagwantup)
+                            && !is_up && st6.flagwantup)
                     /* it is down, but to be restarted soon by s6-supervise; so
                      * for our intent & purposes, it shall be considered up, so
                      * that we stop the restart and place the down file.
@@ -554,7 +554,7 @@ aa_prepare_mainlist (aa_prepare_cb prepare_cb, aa_exec_cb exec_cb)
 
     if (has_longrun)
     {
-        tain_t deadline;
+        tain deadline;
 
         tain_addsec_g (&deadline, 1);
         if (!ftrigr_startf_g (&_aa_ft, &deadline))

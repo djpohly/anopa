@@ -45,7 +45,7 @@
 genalloc ga_iop = GENALLOC_ZERO;
 genalloc ga_progress = GENALLOC_ZERO;
 genalloc ga_pid = GENALLOC_ZERO;
-tain_t iol_deadline;
+tain iol_deadline;
 unsigned int draw = 0;
 int nb_already = 0;
 int nb_done = 0;
@@ -158,7 +158,7 @@ draw_waiting (int already_drawn)
     char buf[UINT_FMT];
     int nb;
     int si;
-    tain_t ts;
+    tain ts;
     int secs;
 
     if (already_drawn)
@@ -1052,9 +1052,9 @@ process_timeouts (aa_mode mode, aa_scan_cb scan_cb)
     int si;
     size_t l;
     size_t i;
-    tain_t ts_timeout;
-    tain_t ts;
-    tain_t tms;
+    tain ts_timeout;
+    tain ts;
+    tain tms;
     int ms = -1;
     int scan = 0;
 
@@ -1237,7 +1237,7 @@ mainloop (aa_mode mode, aa_scan_cb scan_cb)
         int nb_iop;
         int r;
         int ms1, ms2;
-        tain_t tms;
+        tain tms;
 
         if (mode & AA_MODE_IS_DRY)
         {

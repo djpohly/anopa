@@ -52,7 +52,7 @@ enum
 
 typedef struct
 {
-    tain_t stamp;
+    tain stamp;
     aa_evt event;
     int code;
     stralloc sa;
