@@ -13,3 +13,5 @@
 /anopa.1
 /aa-*
 /libanopa.a
+/zig-cache/
+/zig-out/
