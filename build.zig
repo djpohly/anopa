@@ -4,21 +4,54 @@ const std = @import("std");
 const link_to_static_libanopa = false;
 
 // Version will be retrieved from the package/info file
-const version = blk: {
-    // Each line in this file is "key=value"
-    const info = @embedFile("package/info");
-    var lines = std.mem.split(u8, info, "\n");
-    while (lines.next()) |line| {
-        const eq_idx = std.mem.indexOfScalar(u8, line, '=') orelse continue;
-        if (std.mem.eql(u8, line[0..eq_idx], "version")) {
-            break :blk line[eq_idx + 1 ..];
+const pkginfo = KeyValueFileStruct("package/info"){};
+
+/// Parses a key-value file and returns a struct type containing a field for
+/// each key and default values given by the file.
+fn KeyValueFileStruct(comptime filename: []const u8) type {
+    var keys: []const []const u8 = &[_][]const u8{};
+    var values: []const []const u8 = &[_][]const u8{};
+
+    // Read lines from the given file.  Each line is formatted "key=value".
+    {
+        const kvdata = @embedFile(filename);
+        var lines = std.mem.split(u8, kvdata, "\n");
+
+        // Build parallel arrays of keys and values
+        while (lines.next()) |line| {
+            // Ignore lines with no equals sign
+            const eq_idx = std.mem.indexOfScalar(u8, line, '=') orelse continue;
+
+            keys = keys ++ .{ line[0..eq_idx] };
+            values = values ++ .{ line[eq_idx + 1 ..] };
         }
     }
-    // Since this code runs at comptime, this line will not be processed if the
-    // version is found.  I couldn't make this work when the block was written
-    // as a separate function.
-    @compileError("Could not find version in package/info file");
-};
+
+    // Construct the array of struct fields
+    var fields: [keys.len]std.builtin.Type.StructField = undefined;
+    for (&fields, keys, values) |*field, key, value| {
+        field.* = std.builtin.Type.StructField{
+            .name = key,
+            .type = [:0]const u8,
+            .default_value = value,
+            .alignment = 0,
+            .is_comptime = false,
+        };
+    }
+
+    // Return a corresponding type
+    return @Type(std.builtin.Type{
+        .Struct = std.builtin.Type.Struct{
+            .layout = .Auto,
+            .fields = &fields,
+            .decls = &.{},
+            .is_tuple = false,
+        },
+    });
+}
+
+// Version will be retrieved from the package/info file
+const version = pkginfo.version;
 
 const libanopa_files = .{
     "src/libanopa/copy_file.c",
@@ -83,6 +116,11 @@ const aa_initscripts = .{
     "aa-stage4",
 };
 
+const man_pages = .{ "anopa" } ++
+    aa_ctools ++
+    aa_utils ++
+    aa_scripts;
+
 pub fn build(b: *std.Build) !void {
     // Use standard target/optimize options
     const target = b.standardTargetOptions(.{});
@@ -98,7 +136,7 @@ pub fn build(b: *std.Build) !void {
 
     // Build libanopa both shared and static
     const libanopa_shared = b.addSharedLibrary(.{
-        .name = "anopa",
+        .name = pkginfo.package,
         .version = try std.builtin.Version.parse(version),
         .target = target,
         .optimize = optimize,
@@ -110,7 +148,7 @@ pub fn build(b: *std.Build) !void {
     libanopa_shared.install();
 
     const libanopa_static = b.addStaticLibrary(.{
-        .name = "anopa",
+        .name = pkginfo.package,
         .version = try std.builtin.Version.parse(version),
         .target = target,
         .optimize = optimize,
@@ -178,6 +216,24 @@ pub fn build(b: *std.Build) !void {
         b.installBinFile("src/scripts/" ++ script, script);
     }
     inline for (aa_initscripts) |script| {
-        b.installFile("src/scripts/" ++ script, "etc/anopa/" ++ script);
+        b.installLibFile("src/scripts/" ++ script, "anopa/" ++ script);
+    }
+
+    // Man pages
+    inline for (man_pages) |page| {
+        const doc = b.addSystemCommand(&.{
+            "/bin/sh", "-c",
+            "cat \"$1\" doc/footer.pod | pod2man --name=\"$2\" --center=\"$3\" --section=1 --release=\"$4\" > \"$5\"",
+            "sh",
+        });
+        doc.addFileSourceArg(std.Build.FileSource{
+            .path = "doc/" ++ page ++ ".pod"
+        });
+        doc.addArg(page);
+        doc.addArg(pkginfo.package);
+        doc.addArg(pkginfo.version);
+        const outfile = doc.addOutputFileArg("doc/" ++ page ++ ".1");
+        const man = b.addInstallFile(outfile, "man/" ++ page ++ ".1");
+        b.getInstallStep().dependOn(&man.step);
     }
 }
