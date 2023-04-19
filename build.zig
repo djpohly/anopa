@@ -94,7 +94,6 @@ const aa_cutils = .{
     "aa-reboot",
     "aa-service",
     "aa-setready",
-    "aa-sync",
     "aa-terminate",
     "aa-test",
     "aa-tty",
@@ -104,6 +103,7 @@ const aa_cutils = .{
 const aa_utils = .{
     "aa-chroot",
     "aa-pivot",
+    "aa-sync",
 };
 
 const aa_scripts = .{
