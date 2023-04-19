@@ -174,6 +174,16 @@ pub fn build(b: *std.Build) !void {
     else
         libanopa_shared;
 
+    const util_obj = b.addObject(std.build.ObjectOptions{
+        .name = "util",
+        .root_source_file = .{ .path = "src/anopa/util.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    // For now...
+    util_obj.addIncludePath("src/anopa");
+    util_obj.linkLibC();
+
     inline for (aa_ctools) |tool| {
         const exe = b.addExecutable(.{
             .name = tool,
@@ -187,7 +197,7 @@ pub fn build(b: *std.Build) !void {
 
         // Various tools depend on these modules; anything the tool doesn't use
         // will be removed by either optimization or stripping.
-        exe.addCSourceFile("src/anopa/util.c", &.{});
+        exe.addObject(util_obj);
         exe.addCSourceFile("src/anopa/start-stop.c", &.{});
 
         // Needed libraries
