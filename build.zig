@@ -90,7 +90,6 @@ const aa_cutils = .{
     "aa-incmdline",
     "aa-kill",
     "aa-mount",
-    "aa-reboot",
     "aa-service",
     "aa-setready",
     "aa-terminate",
@@ -103,6 +102,7 @@ const aa_utils = .{
     "aa-chroot",
     "aa-ctty",
     "aa-pivot",
+    "aa-reboot",
     "aa-sync",
 };
 
