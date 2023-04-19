@@ -16,6 +16,10 @@ const parsers = .{
     .OLDROOT = clap.parsers.string,
 };
 
+fn usage() !void {
+    try stderr.writeAll("Usage: aa-pivot [OPTION] NEWROOT OLDROOT\n");
+}
+
 pub fn main() !void {
     const args = try clap.parse(clap.Help, &params, &parsers, .{});
 
@@ -24,8 +28,21 @@ pub fn main() !void {
         return;
     }
 
+    if (args.args.help != 0) {
+        try usage();
+        try stderr.writeAll("\n");
+        const opts = clap.HelpOptions{
+            .indent = 1,
+            .description_indent = 10,
+            .description_on_new_line = false,
+            .spacing_between_parameters = 0,
+        };
+        try clap.help(stderr, clap.Help, &params, opts);
+        return;
+    }
+
     if (args.positionals.len != 2 or args.args.help != 0) {
-        try stderr.writeAll("Usage: aa-pivot [-DhV] NEWROOT OLDROOT\n");
+        try usage();
         return;
     }
 
