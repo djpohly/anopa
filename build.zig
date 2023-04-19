@@ -155,7 +155,7 @@ pub fn build(b: *std.Build) !void {
     libanopa_shared.addIncludePath("src/include");
     libanopa_shared.addCSourceFiles(&libanopa_files, &.{});
     libanopa_shared.linkLibC();
-    libanopa_shared.install();
+    b.installArtifact(libanopa_shared);
 
     const libanopa_static = b.addStaticLibrary(.{
         .name = pkginfo.package,
@@ -167,7 +167,7 @@ pub fn build(b: *std.Build) !void {
     libanopa_static.addIncludePath("src/include");
     libanopa_static.addCSourceFiles(&libanopa_files, &.{});
     libanopa_static.linkLibC();
-    libanopa_static.install();
+    b.installArtifact(libanopa_static);
 
     const libanopa = if (link_to_static_libanopa)
         libanopa_static
@@ -197,7 +197,7 @@ pub fn build(b: *std.Build) !void {
         exe.linkLibC();
 
         // Install these to the standard executable path
-        exe.install();
+        b.installArtifact(exe);
     }
 
     inline for (aa_cutils) |util| {
@@ -218,7 +218,7 @@ pub fn build(b: *std.Build) !void {
         exe.linkLibC();
 
         // Install these to the standard executable path
-        exe.install();
+        b.installArtifact(exe);
     }
 
     inline for (aa_utils) |util| {
@@ -233,7 +233,7 @@ pub fn build(b: *std.Build) !void {
         exe.addModule("clap", clap);
 
         // Install these to the standard executable path
-        exe.install();
+        b.installArtifact(exe);
     }
 
     // Other files to include that don't need to be compiled
