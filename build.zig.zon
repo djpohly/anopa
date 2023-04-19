@@ -1,0 +1,10 @@
+.{
+    .name = "anopa",
+    .version = "0.3.0",
+    .dependencies = .{
+        .clap = .{
+            .url = "https://github.com/Hejsil/zig-clap/archive/7658c1a305dcca131eda2d8c823d1d86f59182a3.tar.gz",
+            .hash = "1220ac6276c856cd46d9ccbea9b641a070b42280236c1ab7b51861dc134088183e9a",
+        },
+    },
+}

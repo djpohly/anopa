@@ -85,14 +85,12 @@ const aa_ctools = .{
     "aa-stop",
 };
 
-const aa_utils = .{
-    "aa-chroot",
+const aa_cutils = .{
     "aa-ctty",
     "aa-echo",
     "aa-incmdline",
     "aa-kill",
     "aa-mount",
-    "aa-pivot",
     "aa-reboot",
     "aa-service",
     "aa-setready",
@@ -101,6 +99,11 @@ const aa_utils = .{
     "aa-test",
     "aa-tty",
     "aa-umount",
+};
+
+const aa_utils = .{
+    "aa-chroot",
+    "aa-pivot",
 };
 
 const aa_scripts = .{
@@ -118,6 +121,7 @@ const aa_initscripts = .{
 
 const man_pages = .{ "anopa" } ++
     aa_ctools ++
+    aa_cutils ++
     aa_utils ++
     aa_scripts;
 
@@ -125,6 +129,12 @@ pub fn build(b: *std.Build) !void {
     // Use standard target/optimize options
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
+
+    // Zig dependencies
+    const clap = b.dependency("clap", .{
+        .target = target,
+        .optimize = optimize,
+    }).module("clap");
 
     // Generate a config.h header to replace ./configure.  The only value
     // actually used in the C files is ANOPA_VERSION.
@@ -190,7 +200,7 @@ pub fn build(b: *std.Build) !void {
         exe.install();
     }
 
-    inline for (aa_utils) |util| {
+    inline for (aa_cutils) |util| {
         const exe = b.addExecutable(.{
             .name = util,
             .target = target,
@@ -206,6 +216,21 @@ pub fn build(b: *std.Build) !void {
         exe.linkSystemLibrary("skarnet");
         exe.linkLibrary(libanopa);
         exe.linkLibC();
+
+        // Install these to the standard executable path
+        exe.install();
+    }
+
+    inline for (aa_utils) |util| {
+        const exe = b.addExecutable(.{
+            .name = util,
+            .target = target,
+            .optimize = optimize,
+            .root_source_file = .{ .path = "src/utils/" ++ util ++ ".zig" },
+        });
+
+        // Needed libraries
+        exe.addModule("clap", clap);
 
         // Install these to the standard executable path
         exe.install();
