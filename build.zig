@@ -153,6 +153,8 @@ pub fn build(b: *std.Build) !void {
     });
     libanopa_shared.addConfigHeader(config);
     libanopa_shared.addIncludePath("src/include");
+    libanopa_shared.addLibraryPath("/usr/lib/skalibs");
+    libanopa_shared.addLibraryPath("/usr/lib/s6");
     libanopa_shared.addCSourceFiles(&libanopa_files, &.{});
     libanopa_shared.linkSystemLibrary("skarnet");
     libanopa_shared.linkSystemLibrary("s6");
@@ -167,6 +169,8 @@ pub fn build(b: *std.Build) !void {
     });
     libanopa_static.addConfigHeader(config);
     libanopa_static.addIncludePath("src/include");
+    libanopa_static.addLibraryPath("/usr/lib/skalibs");
+    libanopa_static.addLibraryPath("/usr/lib/s6");
     libanopa_static.addCSourceFiles(&libanopa_files, &.{});
     libanopa_static.linkSystemLibrary("skarnet");
     libanopa_static.linkSystemLibrary("s6");
@@ -197,6 +201,8 @@ pub fn build(b: *std.Build) !void {
         });
         exe.addConfigHeader(config);
         exe.addIncludePath("src/include");
+        exe.addLibraryPath("/usr/lib/skalibs");
+        exe.addLibraryPath("/usr/lib/s6");
         exe.addCSourceFile("src/anopa/" ++ tool ++ ".c", &.{});
 
         // Various tools depend on these modules; anything the tool doesn't use
@@ -222,6 +228,9 @@ pub fn build(b: *std.Build) !void {
             // No Zig source file for these
         });
         exe.addIncludePath("src/include");
+        exe.addLibraryPath("/usr/lib/skalibs");
+        exe.addLibraryPath("/usr/lib/s6");
+        exe.addLibraryPath("/usr/lib/execline");
         exe.addCSourceFile("src/utils/" ++ util ++ ".c", &.{});
 
         // Needed libraries
