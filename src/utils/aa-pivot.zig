@@ -31,13 +31,12 @@ pub fn main() !void {
     if (args.args.help != 0) {
         try usage();
         try stderr.writeAll("\n");
-        const opts = clap.HelpOptions{
+        try clap.help(stderr, clap.Help, &params, .{
             .indent = 1,
             .description_indent = 10,
             .description_on_new_line = false,
             .spacing_between_parameters = 0,
-        };
-        try clap.help(stderr, clap.Help, &params, opts);
+        });
         return;
     }
 

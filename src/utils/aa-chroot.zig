@@ -18,11 +18,30 @@ const parsers = .{
     .ARG = clap.parsers.string,
 };
 
+fn usage() !void {
+    try stderr.writeAll("Usage: aa-chroot [OPTION] NEWROOT COMMAND [ARG...]\n");
+}
+
 pub fn main() !void {
-    const args = try clap.parse(clap.Help, &params, &parsers, .{});
+    const args = clap.parse(clap.Help, &params, &parsers, .{}) catch {
+        try usage();
+        return;
+    };
 
     if (args.args.version != 0) {
         try stderr.writeAll("aa-chroot version 0.z.1\n");
+        return;
+    }
+
+    if (args.args.help != 0) {
+        try usage();
+        try stderr.writeAll("\n");
+        try clap.help(stderr, clap.Help, &params, .{
+            .indent = 1,
+            .description_indent = 10,
+            .description_on_new_line = false,
+            .spacing_between_parameters = 0,
+        });
         return;
     }
 
