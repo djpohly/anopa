@@ -154,6 +154,8 @@ pub fn build(b: *std.Build) !void {
     libanopa_shared.addConfigHeader(config);
     libanopa_shared.addIncludePath("src/include");
     libanopa_shared.addCSourceFiles(&libanopa_files, &.{});
+    libanopa_shared.linkSystemLibrary("skarnet");
+    libanopa_shared.linkSystemLibrary("s6");
     libanopa_shared.linkLibC();
     b.installArtifact(libanopa_shared);
 
@@ -166,6 +168,8 @@ pub fn build(b: *std.Build) !void {
     libanopa_static.addConfigHeader(config);
     libanopa_static.addIncludePath("src/include");
     libanopa_static.addCSourceFiles(&libanopa_files, &.{});
+    libanopa_static.linkSystemLibrary("skarnet");
+    libanopa_static.linkSystemLibrary("s6");
     libanopa_static.linkLibC();
     b.installArtifact(libanopa_static);
 
