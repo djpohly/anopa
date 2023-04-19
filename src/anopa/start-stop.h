@@ -99,7 +99,7 @@ int handle_fd_out (int si);
 int handle_fd_progress (int si);
 int handle_fd_in (void);
 int handle_fd (int fd);
-int handle_longrun (aa_mode mode, uint16 id, char event);
+int handle_longrun (aa_mode mode, uint16_t id, char event);
 int is_locale_utf8 (void);
 int get_cols (int fd);
 int handle_signals (aa_mode mode);
