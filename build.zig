@@ -97,13 +97,13 @@ const aa_cutils = .{
     "aa-terminate",
     "aa-test",
     "aa-tty",
-    "aa-umount",
 };
 
 const aa_utils = .{
     "aa-chroot",
     "aa-pivot",
     "aa-sync",
+    "aa-umount",
 };
 
 const aa_scripts = .{
