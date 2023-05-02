@@ -1,9 +1,9 @@
 const std = @import("std");
 const clap = @import("clap");
+const util = @import("util.zig");
 const linux = std.os.linux;
 const stdout = std.io.getStdOut().writer();
 const stderr = std.io.getStdErr().writer();
-const Allocator = std.mem.Allocator;
 
 const KVPair = struct {
     key: []const u8,
@@ -82,13 +82,6 @@ const parsers = .{
     .C = parseChar,
 };
 
-fn openslurpclose(path: []const u8) ![]u8 {
-    var file = try std.fs.openFileAbsolute(path, .{});
-    defer file.close();
-
-    return file.readToEndAlloc(std.heap.page_allocator, std.mem.page_size);
-}
-
 fn usage() !void {
     try stderr.writeAll("Usage: aa-incmdline [OPTION...] PROG...\n");
 }
@@ -122,7 +115,7 @@ pub fn main() !u8 {
     }
 
     const key = args.positionals[0];
-    const rawdata = openslurpclose(args.args.file orelse "/proc/cmdline") catch return 2;
+    const rawdata = util.openslurpclose(args.args.file orelse "/proc/cmdline") catch return 2;
     const data = std.mem.trimRight(u8, rawdata, "\r\n");
 
     var it = CmdlineIterator.init(data);
