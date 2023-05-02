@@ -1,37 +1,30 @@
 const std = @import("std");
 const clap = @import("clap");
-const linux = std.os.linux;
 const stderr = std.io.getStdErr().writer();
-
-const TIOC = struct {
-    const SCTTY = 0x540E;
-};
+const linux = std.os.linux;
 
 const params = clap.parseParamsComptime(
-    \\-f, --fd <FD>          Use FD as terminal (Default: 0)\n"
-    \\-s, --steal            Steal terminal from other session if needed\n"
+    \\-f, --force            Force unmount even if busy (NFS only)
+    \\-l, --lazy             Perform lazy unmounting
     \\-h, --help             Show this help screen and exit
     \\-V, --version          Show version information and exit
-    \\<PROG>...
+    \\<MOUNTPOINT>
 );
 
-const parsers = .{
-    .FD = clap.parsers.int(std.os.fd_t, 10),
-    .PROG = clap.parsers.string,
-};
-
 fn usage() !void {
-    try stderr.writeAll("Usage: aa-ctty [OPTION...] PROG...\n");
+    try stderr.writeAll("Usage: aa-umount [OPTIONS...] MOUNTPOINT\n");
 }
 
 pub fn main() !void {
-    const args = clap.parse(clap.Help, &params, &parsers, .{}) catch {
+    const args = clap.parse(clap.Help, &params, &.{
+        .MOUNTPOINT = clap.parsers.string,
+    }, .{}) catch {
         try usage();
         return;
     };
 
     if (args.args.version != 0) {
-        try stderr.writeAll("aa-ctty version 0.z.1\n");
+        try stderr.writeAll("aa-umount version 0.z.1\n");
         return;
     }
 
@@ -47,23 +40,27 @@ pub fn main() !void {
         return;
     }
 
-    if (args.positionals.len < 1 or args.args.help != 0) {
+    if (args.positionals.len != 1) {
         try usage();
         return;
     }
 
-    const rc = linux.ioctl(
-            args.args.fd orelse 0,
-            TIOC.SCTTY,
-            if (args.args.steal != 0) 1 else 0,
-    );
+    const flags: u32 = if (args.args.lazy != 0)
+        linux.MNT.DETACH
+    else if (args.args.force != 0)
+        linux.MNT.FORCE
+    else
+        0;
+
+    const rc = linux.umount2(@ptrCast([*:0]const u8, args.positionals[0].ptr), flags);
     switch (linux.getErrno(rc)) {
         .SUCCESS => {},
-        .BADF => return error.InvalidFileDescriptor,
-        .NOTTY => return error.NotATerminal,
+        .BUSY => return error.FileBusy,
+        .INVAL => return error.InvalidArgument,
+        .NAMETOOLONG => return error.NameTooLong,
+        .NOENT => return error.DirNotFound,
+        .NOMEM => return error.SystemResources,
         .PERM => return error.PermissionDenied,
         else => unreachable,
     }
-
-    return std.process.execv(std.heap.page_allocator, args.positionals[1..]);
 }
