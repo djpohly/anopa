@@ -91,7 +91,6 @@ const aa_cutils = .{
     "aa-mount",
     "aa-service",
     "aa-setready",
-    "aa-terminate",
     "aa-test",
 };
 
@@ -102,6 +101,7 @@ const aa_utils = .{
     "aa-pivot",
     "aa-reboot",
     "aa-sync",
+    "aa-terminate",
     "aa-tty",
     "aa-umount",
 };
