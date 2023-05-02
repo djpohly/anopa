@@ -33,7 +33,7 @@ fn KeyValueFileStruct(comptime filename: []const u8) type {
         field.* = std.builtin.Type.StructField{
             .name = key,
             .type = [:0]const u8,
-            .default_value = value,
+            .default_value = @ptrCast(*const anyopaque, &value),
             .alignment = 0,
             .is_comptime = false,
         };
