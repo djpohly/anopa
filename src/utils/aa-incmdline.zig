@@ -5,6 +5,8 @@ const linux = std.os.linux;
 const stdout = std.io.getStdOut().writer();
 const stderr = std.io.getStdErr().writer();
 
+const alloc = std.heap.page_allocator;
+
 const KVPair = struct {
     key: []const u8,
     value: ?[]const u8 = null,
@@ -115,7 +117,8 @@ pub fn main() !u8 {
     }
 
     const key = args.positionals[0];
-    const rawdata = util.openslurpclose(args.args.file orelse "/proc/cmdline") catch return 2;
+    const rawdata = util.openslurpclose(alloc, args.args.file orelse "/proc/cmdline") catch return 2;
+    defer alloc.destroy(rawdata);
     const data = std.mem.trimRight(u8, rawdata, "\r\n");
 
     var it = CmdlineIterator.init(data);
